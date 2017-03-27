@@ -6,8 +6,10 @@
 using namespace Rcpp;
 using namespace arma;
 
+// Needed to compile on WINDOWS:
 typedef unsigned int uint;
 
+// BEGIN: Needed for r-devel (R 3.4)
 void R_init_POUMM(DllInfo *info) {
   /* Register routines,
   allocate resources. */
@@ -18,6 +20,7 @@ void R_init_POUMM(DllInfo *info) {
 void R_unload_POUMM(DllInfo *info) {
     /* Release resources. */
 }
+// END Needed for r-devel (R 3.4)
 
 class Integrator {
   uvec ZERO;

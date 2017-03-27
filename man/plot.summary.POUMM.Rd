@@ -5,10 +5,12 @@
 \title{Plot a summary of a POUMM fit}
 \usage{
 \method{plot}{summary.POUMM}(x, type = c("MCMC"), doPlot = TRUE,
-  interactive = TRUE, stat = c("alpha", "theta", "sigma", "sigmae", "g0",
-  "H2tMean"), chain = NULL, doZoomIn = FALSE,
+  stat = c("alpha", "theta", "sigma", "sigmae", "g0", "H2tMean"),
+  chain = NULL, doZoomIn = FALSE,
   zoomInFilter = paste0("(stat \%in\% c('H2e','H2tMean','H2tInf','H2tMax') |",
-  " (value >= HPDLower & value <= HPDUpper))"), ...)
+  " (value >= HPDLower & value <= HPDUpper))"), palette = c("#999999",
+  "#0072B2", "#CC79A7", "#E69F00", "#D55E00", "#56B4E9", "#009E73", "#F0E442"),
+  ...)
 }
 \arguments{
 \item{x}{An object of class POUMM.}
@@ -18,13 +20,8 @@ Defaults to "MCMC", resulting in a trace and density plot for the selected
 statistics (see argument stat). Currently, only 'MCMC' type is supported.}
 
 \item{doPlot}{Logical indicating whether a plot should be printed on the 
-currently active graphics device or whether to return a list of ggplot 
+currently active graphics device or whether only to return a list of plot- 
 objects for further processing. Defaults to TRUE.}
-
-\item{interactive}{Logical indicating whether the user should press a key 
-before generating a next plot (when needed to display two or more plots).
-Defaults to TRUE. Meaningless if 
-doPlot = FALSE.}
 
 \item{stat}{A character vector with the names of statistics to be plotted.
 These should be names from the stats-list (see argument statFunctions).
@@ -45,14 +42,51 @@ Default value is
  paste0("(stat %in% c('H2e','H2tMean','H2tInf','H2tMax') |",
         " (value >= HPDLower & value <= HPDUpper))").}
 
+\item{palette}{A vector of colors (can be character strings) corresponding to the 
+different chains (in their order 1 (prior), 2, 3). Defaults to c("#999999", 
+"#0072B2", "#CC79A7", "#E69F00", "#D55E00", "#56B4E9", "#009E73", "#F0E442"),
+which is a color-blind friendly.}
+
 \item{...}{Not used; included for compatibility with the generic function plot.}
 }
 \value{
-The function returns nothing if doPlot=TRUE; Otherwise, it returns a
- list with a data.table corresponding to the data passed to ggplot and two
- ggplot objects corresponding to an MCMC-trace and a posterior density plot.
+If doPlot==TRUE, the function returns nothing and produces output on 
+the current graphics device as a side-effect. Otherwise, the function returns
+a list of plot-objects: traceplot and densplot.
 }
 \description{
 Plot a summary of a POUMM fit
+}
+\examples{
+\dontrun{
+library(POUMM)
+
+set.seed(1)
+
+N <- 1000
+
+# create a random non-ultrametric tree of N tips
+tree <- ape::rtree(N)  
+
+# Simulate the evolution of a trait along the tree
+z <- rVNodesGivenTreePOUMM(
+  tree, g0 = 8, alpha = 1, theta = 4, sigma = 1.2, sigmae = .8)
+
+fit <- POUMM(z[1:N], tree, spec = list(nSamplesMCMC = 4e5))
+
+# Summarize the results from the fit in a table:
+summary(fit)
+
+# Create plots for some of the inferred parameters/statistics:
+pl <- plot(fit, stat = c("alpha", "theta", "sigma", "sigmae", "H2tMean"), 
+           doZoomIn = TRUE, 
+           zoomInFilter = paste("!(stat \%in\% c('alpha', 'sigma', 'sigmae')) |",
+                                "(value >= 0 & value <= 8)"),
+           doPlot = FALSE)
+
+pl$traceplot
+pl$densplot
+}
+
 }
 

@@ -113,8 +113,8 @@ fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- POUMM::prun
 ## ----fitPOUMM-1, results="hide", message=FALSE, warning=FALSE, eval=FALSE----
 #  fitPOUMM <- POUMM::POUMM(z[1:N], tree)
 
-## ---- fig.height=4, fig.show="hold", fig.width=7, warning=FALSE, fig.cap="MCMC traces and posterior density plots from a POUMM MCMC-fit. Black dots on the x-axis indicate the ML-fit.", eval=TRUE----
-plot(fitPOUMM, interactive = FALSE)
+## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC traces and posterior density plots from a POUMM MCMC-fit. Black dots on the x-axis indicate the ML-fit.", results="hide", eval=TRUE----
+plot(fitPOUMM)
 
 ## ---- warning=FALSE, eval=TRUE-------------------------------------------
 summary(fitPOUMM)
@@ -122,7 +122,7 @@ summary(fitPOUMM)
 ## ----fitPOUMM-2, results="hide", eval=FALSE------------------------------
 #  fitPOUMM2 <- POUMM::POUMM(z[1:N], tree, spec=list(nSamplesMCMC = 4e5))
 
-## ---- fig.height=4, fig.show="hold", fig.width=7, warning=FALSE, eval=TRUE----
+## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, results="hide", eval=TRUE----
 filter <- paste0(
        "(stat %in% c('H2e','H2tMean','H2tInf','H2tMax')) | ",
        "(stat == 'alpha' & value >= 0 & value <= 4) | ",
@@ -130,7 +130,8 @@ filter <- paste0(
        "(stat == 'sigmae' & value >= 0 & value <= 2) | ",
        "(stat == 'g0' & value >= -4 & value <= 4) | ",
        "(stat == 'theta' & value >= -2 & value <= 4)")
-plot(fitPOUMM2, interactive = FALSE, doZoomIn = TRUE, zoomInFilter = filter)
+pl <- plot(fitPOUMM2, doPlot = FALSE, doZoomIn = TRUE, zoomInFilter = filter)
+pl$densplot
 
 ## ---- warning=FALSE, eval=TRUE-------------------------------------------
 summary(fitPOUMM2)
@@ -196,8 +197,8 @@ specH2tMean$parUpper
 ## ----eval=FALSE----------------------------------------------------------
 #  fitH2tMean <- POUMM::POUMM(z[1:N], tree, spec = specH2tMean)
 
-## ---- fig.height=4, fig.show="hold", fig.width=7, warning=FALSE----------
-plot(fitH2tMean, stat = c("H2tMean", "H2e", "H2tInf", "sigmae"), interactive = FALSE,
+## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE------
+plot(fitH2tMean, stat = c("H2tMean", "H2e", "H2tInf", "sigmae"), 
      doZoomIn = TRUE, zoomInFilter = "value >= 0 & value <= 1")
 
 ## ---- warning=FALSE------------------------------------------------------
@@ -216,7 +217,7 @@ mcmcSampling <- c("adaptMCMC")
 mcmcDiagnosis <- c("coda")
 otherPackages <- c("parallel", "foreach", "data.table", "Matrix", "gsl")
 treeProcessing <- c("ape")
-reporting <- c("data.table", "ggplot2", "lmtest")
+reporting <- c("data.table", "ggplot2", "GGally", "lmtest")
 testing <- c("testthat", "mvtnorm", "TreeSim")
  
 packagesUsed <- c(likCalculation, mcmcDiagnosis, otherPackages, treeProcessing, reporting, testing)
@@ -233,5 +234,5 @@ printPackages <- function(packs) {
 }
 
 # Write bib information (this line is executed manually and the bib-file is edited manually after that)
-# knitr::write_bib(packagesUsed, file = "./REFERENCES.bib")
+# knitr::write_bib(packagesUsed, file = "./REFERENCES-R.bib")
 
