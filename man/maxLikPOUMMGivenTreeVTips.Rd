@@ -39,12 +39,4 @@ a list containing an element par and an element value as well as the
 \description{
 Find a maximum likelihood fit of the POUMM model
 }
-\details{
-If alpha is not fixed, then the optimization is done via calls to 
-  optimize over alpha, calling optim on the remaining variable parameters for
-  each alpha. The parameter tol is passed to optimize (default value is 
-  0.001), which guarantees that no evaluation is done on points closer than 
-  eps*|alpha*|+tol/3, where eps is .Machine$double.eps and alpha* is the 
-  optimal alpha.
-}
 

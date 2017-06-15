@@ -45,12 +45,18 @@ instead of likelihood, default is TRUE.}
 \item{pruneInfo}{list returned by pruneTree(tree) to be passed in explicit
 calls to dVGivenTreeOU.}
 
-\item{usempfr, maxmpfr}{integer indicating if and how mpfr should be used for
-small parameter values (any(c(alpha, sigma, sigmae) < 0.01)). Using the
-mpfr package can be forced by specifying an integer greater or equal to 2.
-Setting usempfr=0 disables high precision likelihood calculation. Requires
-the Rmpfr package. Note that when using mpfr, the time for one likelihood
-calculation can increase more than 100-fold. Default (0).}
+\item{usempfr}{integer indicating if and how mpfr should be used for small 
+parameter values (any(c(alpha, sigma, sigmae) < 0.01)). Using the mpfr 
+package can be forced by specifying an integer greater or equal to 2. 
+Setting usempfr=0 (default) causes high precision likelihood 
+calculation to be done on each encounter of parameters with at least 1 bigger
+log-likelihood value than any of the currently found
+maximum log-likelihood or the previously calculated log-likelihood value
+Requires the Rmpfr package. Note that using mpfr may increase the time for 
+one likelihood calculation more than 100-fold. Set usempfr to -1 or less
+to completely disable Rmpfr functionality.}
+
+\item{maxmpfr}{integer (not used)}
 
 \item{precbits}{integer specifying precision bits for mpfr. Default is 512.}
 

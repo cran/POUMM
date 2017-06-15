@@ -15,8 +15,10 @@ rVNodesGivenTreePOUMM(tree, z0, alpha, theta, sigma, sigmae = 0)
 \item{alpha, theta, sigma}{Numeric values, parameters of the OU process.}
 
 \item{sigmae}{Numeric non-negative value (default 0). Specifies the standard
-deviation of random environmental contribution (white noise) to be added to
-the values.}
+deviation of random environmental contribution and or measurement standard 
+error to be added to the values (white noise). Note that if measurement standard
+error, se, is known and needs to be added to the environmental contribution,
+the right way to specify the parameter would be sqrt(sigmae^2+se^2).}
 }
 \value{
 A numeric vector containing the generated values at all nodes

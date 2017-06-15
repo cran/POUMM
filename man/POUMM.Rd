@@ -4,8 +4,8 @@
 \alias{POUMM}
 \title{The Phylogenetic (Ornstein-Uhlenbeck) Mixed Model}
 \usage{
-POUMM(z, tree, zName = "z", treeName = "tree", parDigits = 6,
-  usempfr = 0, useArma = TRUE, ..., spec = NULL, doMCMC = TRUE,
+POUMM(z, tree, se = 0, zName = "z", treeName = "tree", parDigits = 6,
+  usempfr = 0, useCpp = TRUE, ..., spec = NULL, doMCMC = TRUE,
   verbose = FALSE, debug = FALSE)
 }
 \arguments{
@@ -15,6 +15,12 @@ tree - a phylo object (it is possible to specify different element names
 using the arguments zName and treeName).}
 
 \item{tree}{A phylo object or NULL in case z is a list.}
+
+\item{se}{A non-negative numerical vector (or single number) indicating known 
+measurement standard error (defaults to 0). Note the elements of this vector 
+are assumed to describe the measurement error at individual nodes independent
+of the environmental contribution (described by the parameter sigmae). The total
+error standard deviation is thus sqrt(sigmae2+se^2).}
 
 \item{zName, treeName}{Character strings used when the parameter z is a list; 
 indicate the names in the list of the values-vector and the tree. Default: 
@@ -31,16 +37,18 @@ to disable rounding.}
 \item{usempfr}{integer indicating if and how mpfr should be used for small 
 parameter values (any(c(alpha, sigma, sigmae) < 0.01)). Using the mpfr 
 package can be forced by specifying an integer greater or equal to 2. 
-Setting usempfr=0 disables high precision likelihood calculation. Requires 
-the Rmpfr package. Note that when using mpfr, the time for one likelihood 
-calculation can increase more than 100-fold. Default (0). Note that during 
-the ML and MCMC fit this flag is temporarily raised by 1 in order to enable 
-mpfr-check on parameters resulting in higher likelihood than the current 
-maximum one.}
+Setting usempfr=0 (default) causes high precision likelihood 
+calculation to be done on each encounter of parameters with at least 1 bigger
+log-likelihood value than any of the currently found
+maximum log-likelihood or the previously calculated log-likelihood value
+Requires the Rmpfr package. Note that using mpfr may increase the time for 
+one likelihood calculation more than 100-fold. Set usempfr to -1 or less
+to completely disable Rmpfr functionality.}
 
-\item{useArma}{Logical indicating if the Armadillo library should be used for 
-faster vector operations. Defaults to TRUE. Since Armadillo doesn't support 
-mpfr, it gets disabled when usempfr is bigger than 0.}
+\item{useCpp}{Logical indicating whether C++ likelihood calculation should be 
+used for faster vector operations. Defaults to TRUE. Since the C++ likelihood
+implementation does not support mpfr, useCpp gets disabled when usempfr is 
+bigger than 0.}
 
 \item{...}{additional arguments passed to the likPOUMMGivenTreeVTips function 
 (?dVGivenTreeOU for details).}
@@ -48,7 +56,8 @@ mpfr, it gets disabled when usempfr is bigger than 0.}
 \item{spec}{A named list specifying how the ML and MCMC fit should be done. 
 See ?specifyPOUMM.}
 
-\item{doMCMC}{logical: should a MCMC fit be performed. An MCMC fit provides a 
+\item{doMCMC}{Deprecated - use nSamplesMCMC = 0 instead. 
+logical: should a MCMC fit be performed. An MCMC fit provides a 
 sample from the posterior distribution of the parameters given a prior 
 distribution and the data. Unlike the ML-fit, it allows to estimate 
 confidence intervals for the estimated parameters. This argument is TRUE by 
@@ -97,8 +106,7 @@ lmtest::lrtest(fitPMM, fit)
 
 }
 \references{
-Mitov, V., and Stadler, T. (2017). POUMM: An R-package for Bayesian Inference 
- of Phylogenetic Heritability. bioRxiv, 115089. 
+Mitov, V., and Stadler, T. (2017). Fast and Robust Inference of Phylogenetic Ornstein-Uhlenbeck Models Using Parallel Likelihood Calculation. bioRxiv, 115089. 
  https://doi.org/10.1101/115089
  
  Vihola, M. (2012). Robust adaptive Metropolis algorithm with coerced 

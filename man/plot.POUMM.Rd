@@ -8,8 +8,12 @@
   interactive = TRUE, stat = c("alpha", "theta", "sigma", "sigmae", "g0",
   "H2tMean"), chain = NULL, startMCMC = NA, endMCMC = NA,
   thinMCMC = 1000, statFunctions = statistics(x), doZoomIn = FALSE,
-  zoomInFilter = paste0("(stat \%in\% c('H2e','H2tMean','H2tInf','H2tMax') |",
-  " (value >= HPDLower & value <= HPDUpper))"), ...)
+  zoomInFilter = paste0("(stat \%in\% c('H2e','H2tMean','H2tInf','H2tMax') & ",
+  "(value >= 0 & value <= 1) ) |",
+  "( !stat \%in\% c('H2e','H2tMean','H2tInf','H2tMax') & ",
+  "(value <= median(HPDUpper) + 4 * (median(HPDUpper) - median(HPDLower)) &",
+  "value >= median(HPDLower) - 4 * (median(HPDUpper) - median(HPDLower))))"),
+  prettyNames = TRUE, showUnivarDensityOnDiag = FALSE, ...)
 }
 \arguments{
 \item{x}{An object of class POUMM.}
@@ -43,15 +47,28 @@ produced plots should have a limitation on the x-axis according to an
 expression set in zoomInFilter (see below). Default value is FALSE.}
 
 \item{zoomInFilter}{A character string which evaluates as logical value. If 
-doZoomIn is set to TRUE, this filter is applied to each point in each MCMC
-chain and the data-point is filtered out if it evaluates to FALSE. This 
-allows to zoomIn the x-axis of density plots but should be use with caution,
-since filtering out points from the MCMC-sample can affect the kernel 
-densities. Default value is 
- paste0("(stat %in% c('H2e','H2tMean','H2tInf','H2tMax') |",
-        " (value >= HPDLower & value <= HPDUpper))"). 
+ doZoomIn is set to TRUE, this filter is applied to each point in each MCMC
+ chain and the data-point is filtered out if it evaluates to FALSE. This 
+ allows to zoomIn the x-axis of density plots but should be used with caution,
+ since filtering out points from the MCMC-sample can affect the kernel densities.
+ Unfortunately, filtering out values is currently the only way to affect the
+ limits of individual facets in ggplot2. The default value is a complicated 
+ expression involving the HPD from all MCMC chains (normally one chain from the
+ prior and 2 chains from the posterior):
+ zoomInFilter = paste0("(stat %in% c('H2e','H2tMean','H2tInf','H2tMax') & ", 
+ "(value >= 0 & value <= 1) ) |",
+ "( !stat %in% c('H2e','H2tMean','H2tInf','H2tMax') & ",
+ "(value <= median(HPDUpper) + 4 * (median(HPDUpper) - median(HPDLower)) &",
+ "value >= median(HPDLower) - 4 * (median(HPDUpper) - median(HPDLower))))").
 The identifiers in this expression can be any
-column names found in a summary of a POUMM object.}
+ column names found in a summary of a POUMM object.}
+
+\item{prettyNames}{A logical indicating if greek letters and sub/superscripts 
+should be used for the names of columns in the posterior density pairs-plot.}
+
+\item{showUnivarDensityOnDiag}{A logical indicating if univariate density 
+plots should be displaied on the main diagonal in the bivariate posterior plot.
+Defaults to FALSE, in which case the column names are displayed on the diagonal.}
 
 \item{...}{not used, needed for consistency with the generic plot-function.}
 }

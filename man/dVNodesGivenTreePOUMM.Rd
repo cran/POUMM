@@ -16,12 +16,17 @@ representing the observed values at the tips, root and internal nodes.}
 
 \item{alpha, theta, sigma}{Numeric values, parameters of the OU model.}
 
-\item{sigmae}{Numeric non-negative value (default 0). Specifies the standard 
-deviation of random environmental contribution (white noise) to be added to
-the values.}
+\item{sigmae}{Numeric non-negative value or vector of length(z) elements 
+(default 0). Specifies the
+ standard deviation of random environmental contribution (and eventually 
+ measurement error) to be added to the values. Note that if measurement standard
+ error, se, is known and needs to be added to the environmental contribution,
+ the right way to specify the parameter would be sqrt(sigmae^2+se^2), not
+ sigmae+se.}
 
 \item{e}{Numeric vector of size length(z) representing exactly known 
-measurement errors. Defaults to a vector of zeroes.}
+error (sum of environmental contribution and measurement error). 
+Defaults to a vector of zeroes.}
 
 \item{log}{Logical indicating whether a log-likelihood should be returned 
 instead of a likelihood. Default is TRUE.}

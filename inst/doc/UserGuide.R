@@ -7,7 +7,8 @@ knitr::opts_chunk$set(cache = FALSE)
 options(digits = 4)
 
 # set this to FALSE to disable cache and run all MCMC-fits.
-useCachedResults <- file.exists("UserGuideCache.RData") & TRUE 
+useCachedResults <- file.exists("UserGuideCache.RData") & TRUE
+
 
 ## ----install, eval=FALSE-------------------------------------------------
 #  install.packages('POUMM')
@@ -84,7 +85,7 @@ if(!useCachedResults) {
   cluster <- parallel::makeCluster(parallel::detectCores(logical = FALSE))
   doParallel::registerDoParallel(cluster)
   
-  fitPOUMM <- POUMM::POUMM(z[1:N], tree, spec=list(thinMCMC = 1000, parallelMCMC=TRUE))
+  fitPOUMM <- POUMM::POUMM(z[1:N], tree, spec=list(thinMCMC = 1000, parallelMCMC=TRUE), verbose = TRUE)
   fitPOUMM2 <- POUMM::POUMM(z[1:N], tree, spec=list(nSamplesMCMC = 4e5, thinMCMC = 1000, parallelMCMC=TRUE))
   
   specH2tMean <- POUMM::specifyPOUMM_ATH2tMeanSeG0(z[1:N], tree, 
@@ -114,7 +115,7 @@ fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- POUMM::prun
 #  fitPOUMM <- POUMM::POUMM(z[1:N], tree)
 
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC traces and posterior density plots from a POUMM MCMC-fit. Black dots on the x-axis indicate the ML-fit.", results="hide", eval=TRUE----
-plot(fitPOUMM)
+plot(fitPOUMM, showUnivarDensityOnDiag = TRUE)
 
 ## ---- warning=FALSE, eval=TRUE-------------------------------------------
 summary(fitPOUMM)
@@ -123,14 +124,7 @@ summary(fitPOUMM)
 #  fitPOUMM2 <- POUMM::POUMM(z[1:N], tree, spec=list(nSamplesMCMC = 4e5))
 
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, results="hide", eval=TRUE----
-filter <- paste0(
-       "(stat %in% c('H2e','H2tMean','H2tInf','H2tMax')) | ",
-       "(stat == 'alpha' & value >= 0 & value <= 4) | ",
-       "(stat == 'sigma' & value >= 0 & value <= 2) | ",
-       "(stat == 'sigmae' & value >= 0 & value <= 2) | ",
-       "(stat == 'g0' & value >= -4 & value <= 4) | ",
-       "(stat == 'theta' & value >= -2 & value <= 4)")
-pl <- plot(fitPOUMM2, doPlot = FALSE, doZoomIn = TRUE, zoomInFilter = filter)
+pl <- plot(fitPOUMM2, doPlot = FALSE, doZoomIn = TRUE)
 pl$densplot
 
 ## ---- warning=FALSE, eval=TRUE-------------------------------------------
@@ -199,7 +193,8 @@ specH2tMean$parUpper
 
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE------
 plot(fitH2tMean, stat = c("H2tMean", "H2e", "H2tInf", "sigmae"), 
-     doZoomIn = TRUE, zoomInFilter = "value >= 0 & value <= 1")
+     showUnivarDensityOnDiag = TRUE, 
+     doZoomIn = TRUE, doPlot = TRUE)
 
 ## ---- warning=FALSE------------------------------------------------------
 summary(fitH2tMean)[stat %in% c("H2tMean", "H2e", "H2tInf", "sigmae")]

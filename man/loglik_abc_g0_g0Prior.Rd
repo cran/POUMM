@@ -6,15 +6,13 @@
 for the given coefficients abc, and parameters theta, g0 and g0Prior. This is
 an internal function.}
 \usage{
-loglik_abc_g0_g0Prior(abc, theta, sigma, g0, g0Prior)
+loglik_abc_g0_g0Prior(abc, alpha, theta, sigma, g0, g0Prior)
 }
 \arguments{
 \item{abc}{a vector of 3 numerical values denoting the corresponding 
 coefficients in the POUMM likelihood presented as exp(a g0^2 + b g0 + c).}
 
-\item{theta}{parameter theta of the OU-process.}
-
-\item{sigma}{parameter sigma of the OU-process.}
+\item{alpha, theta, sigma}{parameters of the OU-process.}
 
 \item{g0}{initial value at the root of the tree (can be NA). See argument
 parMapping in ?specifyPOUMM.}

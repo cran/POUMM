@@ -169,8 +169,8 @@ observed tip-values (z) and root-tip distances (t). Some of these values
 \preformatted{
 # Default for POUMM:
 parLower = c(alpha = 0, theta = zMin - 2 * (zMax - zMin), sigma = 0, sigmae = 0)
-parUpper = c(alpha = 50, theta = zMax + 2 * (zMax - zMin), 
-             sigma = POUMM::sigmaOU(H2 = .99, alpha = 50, sigmae = 2 * zSD,
+parUpper = c(alpha = 69.31 / tMean, theta = zMax + 2 * (zMax - zMin), 
+             sigma = POUMM::sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD,
                                     t = tMean), 
              sigmae = 2 * zSD)
 }}
@@ -198,9 +198,9 @@ log-prior for this parameter vector. Example: \cr
 \preformatted{
 # Default for POUMM:
  parPriorMCMC = function(par) {
-   dexp(par[1], rate = .01, TRUE) + 
+   dexp(par[1], rate = tMean / 6.931, TRUE) + 
      dnorm(par[2], zMean, 10 * zSD, TRUE) +
-     dexp(par[3],  rate = .0001, TRUE) + 
+     dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), TRUE) + 
      dexp(par[4], rate = .01, TRUE)
  }
 }}
@@ -233,7 +233,9 @@ matrix for the MCMC fit. Default for POUMM is diag(4);}
 \item{nSamplesMCMC}{Integer indicating the length of each MCMC chain. 
 Defaults to 1e5.}
 
-\item{nAdaptMCMC}{Integer indicating how many initial MCMC iterations should 
+\item{nAdaptMCMC}{Logical indicating whether adaptation of the MCMC jump 
+distribution should be done with respect to the target acceptance rate 
+(accRateMCMC) or integer indicating how many initial MCMC iterations should 
 be used for adaptation of the jump-distribution matrix (see details in 
 ?POUMM). Defaults to nSamplesMCMC meaning continuous adaptation throughout
 the MCMC.}
@@ -242,7 +244,8 @@ the MCMC.}
 Defaults to 100.}
 
 \item{accRateMCMC}{numeric between 0 and 1 indicating the target 
-acceptance rate of the Metropolis sampling (see details in ?POUMM). Default 0.01.}
+acceptance rate of the  adaptive Metropolis sampling (see details in ?POUMM). 
+Default 0.01.}
 
 \item{gammaMCMC}{controls the speed of adaption. Should be between 0.5 and
 1. A lower gamma leads to faster adaption. Default value is 0.5.}
