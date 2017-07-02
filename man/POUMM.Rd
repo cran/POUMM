@@ -6,7 +6,8 @@
 \usage{
 POUMM(z, tree, se = 0, zName = "z", treeName = "tree", parDigits = 6,
   usempfr = 0, useCpp = TRUE, ..., spec = NULL, doMCMC = TRUE,
-  verbose = FALSE, debug = FALSE)
+  likPOUMM_lowLevelFun = POUMM::likPOUMMGivenTreeVTipsC2, verbose = FALSE,
+  debug = FALSE)
 }
 \arguments{
 \item{z}{Either a numeric vector containing the phenotypic values at the tips 
@@ -66,6 +67,14 @@ Metropolis sampler from the package "adaptMCMC" written by Andreas
 Scheidegger. To obtain meaningful estimates MCMC may need to run for several
 millions of iterations (parameter nSamplesMCMC set to 1e5 by default). See 
 parameters ending at MCMC in ?specifyPOUMM for details.}
+
+\item{likPOUMM_lowLevelFun}{the low-level function used for POUMM - likelihood 
+calculation. Default value is POUMM::likPOUMMGivenTreeVTipsC2, which would be 
+the fastest on most SIMD-enabled systems and on trees of less than 1000 tips. 
+For bigger trees it may be of benefit to set this parameter to 
+POUMM::likPOUMMGivenTreeVTipsC4, which uses OMP parallelization (best parallel
+speedup achieved on Linux systems with Intel processor and Intel compiler). See
+also the Parallelization section in the package user guide.}
 
 \item{verbose, debug}{Logical flags indicating whether to print informative 
 and/or debug information on the standard output (both are set to to FALSE by

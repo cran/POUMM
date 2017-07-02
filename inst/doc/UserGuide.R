@@ -99,23 +99,29 @@ if(!useCachedResults) {
   
   # delete some of the slots to make cach-file smaller :-(.
   fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- NULL
-  fitPOUMM$loglik <- fitPOUMM2$loglik <- fitH2tMean$loglik <- NULL
-  fitPOUMM$fitMCMC$post <- fitPOUMM2$fitMCMC$post <- fitH2tMean$fitMCMC$post <- NULL
-  fitPOUMM$spec$parPriorMCMC <- fitPOUMM2$spec$parPriorMCMC <- fitH2tMean$spec$parPriorMCMC <- NULL
-  fitPOUMM$spec$parInitMCMC <- fitPOUMM2$spec$parInitMCMC <- fitH2tMean$spec$parInitMCMC <- NULL
+  #fitPOUMM$loglik <- fitPOUMM2$loglik <- fitH2tMean$loglik <- NULL
+  #fitPOUMM$fitMCMC$post <- fitPOUMM2$fitMCMC$post <- fitH2tMean$fitMCMC$post <- NULL
+  #fitPOUMM$spec$parPriorMCMC <- fitPOUMM2$spec$parPriorMCMC <- fitH2tMean$spec$parPriorMCMC <- NULL
+  #fitPOUMM$spec$parInitMCMC <- fitPOUMM2$spec$parInitMCMC <- fitH2tMean$spec$parInitMCMC <- NULL
   
   save(g, z, tree, e, 
        fitPOUMM2, fitPOUMM, fitH2tMean,
        file="UserGuideCache.RData")
 } 
 # restore the pruneInfo since it is needed afterwards.
-fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- POUMM::pruneTree(tree, z[1:N])
+fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- POUMM::pruneTree(tree, z[1:length(tree$tip.label)])
 
 ## ----fitPOUMM-1, results="hide", message=FALSE, warning=FALSE, eval=FALSE----
 #  fitPOUMM <- POUMM::POUMM(z[1:N], tree)
 
-## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC traces and posterior density plots from a POUMM MCMC-fit. Black dots on the x-axis indicate the ML-fit.", results="hide", eval=TRUE----
-plot(fitPOUMM, showUnivarDensityOnDiag = TRUE)
+## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC traces from a POUMM MCMC-fit.", results="hide", eval=TRUE----
+
+# get a list of plots 
+plotList <- plot(fitPOUMM, showUnivarDensityOnDiag = TRUE, doPlot = FALSE)
+plotList$traceplot
+
+## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC univariate density plots. Black dots on the x-axis indicate the ML-fit."----
+plotList$densplot
 
 ## ---- warning=FALSE, eval=TRUE-------------------------------------------
 summary(fitPOUMM)
@@ -124,8 +130,8 @@ summary(fitPOUMM)
 #  fitPOUMM2 <- POUMM::POUMM(z[1:N], tree, spec=list(nSamplesMCMC = 4e5))
 
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, results="hide", eval=TRUE----
-pl <- plot(fitPOUMM2, doPlot = FALSE, doZoomIn = TRUE)
-pl$densplot
+plotList <- plot(fitPOUMM2, doPlot = FALSE)
+plotList$densplot
 
 ## ---- warning=FALSE, eval=TRUE-------------------------------------------
 summary(fitPOUMM2)
@@ -150,7 +156,7 @@ c(# phylogenetic heritability at mean root-tip distance:
 
 ## ---- warning=FALSE------------------------------------------------------
 c(H2empirical = var(g[1:N])/var(z[1:N]))
-summary(fitPOUMM2)["H2tMean"==stat, unlist(HPD)]
+summary(fitPOUMM2)["H2e"==stat, unlist(HPD)]
 
 ## ---- echo=TRUE, eval=FALSE----------------------------------------------
 #  # set up a parallel cluster on the local computer for parallel MCMC:

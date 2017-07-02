@@ -1,8 +1,8 @@
 Package: POUMM
 Type: Package
 Title: The Phylogenetic Ornstein-Uhlenbeck Mixed Model
-Version: 1.3.0
-Date: 2017-06-15
+Version: 1.3.2
+Date: 2017-07-02
 Authors@R: person("Venelin", "Mitov", email = "vmitov@gmail.com",
                  role = c("aut", "cre", "cph"))
 Description: The Phylogenetic Ornstein-Uhlenbeck Mixed Model (POUMM) allows to 
@@ -23,16 +23,16 @@ License: GPL (>= 3.0)
 LazyData: true
 Depends: R (>= 3.1.0), stats, Rcpp, methods
 LinkingTo: Rcpp, RcppArmadillo
-Imports: ape, data.table, coda, foreach, ggplot2, GGally, gsl, Matrix,
-        adaptMCMC
+Imports: ape, data.table(>= 1.10.4), coda, foreach, ggplot2, GGally,
+        gsl, adaptMCMC, utils
 Suggests: testthat, TreeSim (>= 2.2), Rmpfr, mvtnorm, lmtest, knitr,
-        rmarkdown, parallel, doParallel
+        rmarkdown, parallel, doParallel, microbenchmark
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr
 ByteCompile: yes
 NeedsCompilation: yes
-Packaged: 2017-06-15 19:48:58 UTC; vmitov
+Packaged: 2017-07-02 11:43:30 UTC; vmitov
 Author: Venelin Mitov [aut, cre, cph]
 Maintainer: Venelin Mitov <vmitov@gmail.com>
 Repository: CRAN
-Date/Publication: 2017-06-15 23:06:56 UTC
+Date/Publication: 2017-07-02 14:23:35 UTC

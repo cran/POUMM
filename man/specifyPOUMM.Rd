@@ -201,7 +201,7 @@ log-prior for this parameter vector. Example: \cr
    dexp(par[1], rate = tMean / 6.931, TRUE) + 
      dnorm(par[2], zMean, 10 * zSD, TRUE) +
      dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), TRUE) + 
-     dexp(par[4], rate = .01, TRUE)
+     dexp(par[4], rate = 2 / zSD, TRUE)
  }
 }}
 
