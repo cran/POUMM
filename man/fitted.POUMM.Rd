@@ -24,4 +24,3 @@ genotypic values corresponding to the tip-labels in the tree is returned.
 Extract maximum likelihood expected genotypic values at the tips of a tree,
 to which a POUMM model has been previously fitted
 }
-

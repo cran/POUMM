@@ -17,4 +17,3 @@ An integer vector.
 \description{
 Edge indices of the edges in tree starting from n
 }
-

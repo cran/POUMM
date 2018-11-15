@@ -3,10 +3,10 @@
 \name{OU}
 \alias{OU}
 \alias{dOU}
-\alias{meanOU}
 \alias{rOU}
-\alias{sdOU}
+\alias{meanOU}
 \alias{varOU}
+\alias{sdOU}
 \title{Distribution of an Ornstein-Uhlenbeck Process at Time \eqn{t}, Given 
   Initial State at Time \eqn{0}}
 \usage{
@@ -81,6 +81,7 @@ Similar to dnorm and rnorm, the functions described in this
 
 \item \code{sdOU}: standard deviation
 }}
+
 \examples{
 z0 <- 8
 t <- 10
@@ -91,4 +92,3 @@ var(sample)  # around 1/4
 varOU(t, 2, 1) 
 
 }
-

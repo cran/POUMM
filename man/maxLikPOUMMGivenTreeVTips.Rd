@@ -39,4 +39,3 @@ a list containing an element par and an element value as well as the
 \description{
 Find a maximum likelihood fit of the POUMM model
 }
-

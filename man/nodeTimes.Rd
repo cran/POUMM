@@ -20,4 +20,3 @@ A vector of size the number of nodes in the tree (tips, root,
 \description{
 Calculate the time from the root to each node of the tree
 }
-

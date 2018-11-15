@@ -17,4 +17,3 @@ The number of tips in the tree, POUMM has been called on
 \description{
 Number of tips in a phylogenetic tree, POUMM has been fit on.
 }
-

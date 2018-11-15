@@ -22,4 +22,3 @@ deviation of random environmental contribution (white noise) included in z.}
 \description{
 Distribution of the genotypic values under a POUMM fit
 }
-

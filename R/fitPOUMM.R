@@ -17,7 +17,7 @@ memoiseMax <- function(f, par, memo, verbose, ...) {
     assign('val', val, pos = memo)
     assign('valDelta', val - valMemo, pos = memo)
     
-    if(verbose) {
+    if(interactive() && verbose) {
       cat('\nCall ', countMemo, ': loglik on par=(', 
           toString(round(par, 6)), "): ", val, "\n", sep = "")
     }
@@ -121,7 +121,7 @@ maxLikPOUMMGivenTreeVTips <- function(
     control$fnscale <- -1
     
     if(length(parInitML) > 0) {
-      if(verbose) {
+      if(interactive() && verbose) {
         cat("Call to optim no.", iOptimTry, ": starting from ", 
             toString(round(parInitML, 6)), "\n", 
             "parLower = ", toString(round(parLower, 6)), "\n",
@@ -169,7 +169,9 @@ convertToMCMC <- function(obj, thinMCMC=1) {
     mcmc = winmcmc, log.p = log.p, 
     accRateMCMC = obj$acceptance.rate, 
     adaption = obj$adaption, n.sample = obj$n.sample, cov.jump = obj$cov.jump,
-    sampling.parameters = obj$sampling.parameters, 
+    # This is causing the saved fit objects to be abnormally big.
+    # Try not using it. 
+    #sampling.parameters = obj$sampling.parameters, 
     scale.start = obj$scale.start)
 }
 
@@ -243,19 +245,20 @@ analyseMCMCs <- function(chains, stat=NULL, statName="logpost",
         
       }))
     names(mcs) <- names(chains)
-  } else if(statName == 'g0') {
-    mcs <- as.mcmc.list(
-      lapply(1:length(log.ps), function(i) {
-        if(is.matrix(log.ps[[i]])) {
-          log.ps[[i]][, 3, drop = FALSE]  
-        } else {
-          mcmc(matrix(as.double(NA), length(log.ps[[i]])), 
-               start = start(log.ps[[i]]),
-               end = end(log.ps[[i]]), thin = thin(log.ps[[i]]))
-        }
-      }))
-    names(mcs) <- names(chains)
-  } else {
+  # } else if(statName == 'g0') {
+  #   mcs <- as.mcmc.list(
+  #     lapply(1:length(log.ps), function(i) {
+  #       if(is.matrix(log.ps[[i]])) {
+  #         log.ps[[i]][, 3, drop = FALSE]  
+  #       } else {
+  #         mcmc(matrix(as.double(NA), length(log.ps[[i]])), 
+  #              start = start(log.ps[[i]]),
+  #              end = end(log.ps[[i]]), thin = thin(log.ps[[i]]))
+  #       }
+  #     }))
+  #   names(mcs) <- names(chains)
+  # } 
+    } else {
     mcs <- as.mcmc.list(lapply(mcmcs, function(mc) {
       winmcmc <- window(mc$mcmc, start = start, end = end, thin = thinMCMC)
       data <- matrix(stat(winmcmc, ...), nrow = nrow(winmcmc), byrow = TRUE)
@@ -344,8 +347,7 @@ analyseMCMCs <- function(chains, stat=NULL, statName="logpost",
 #' @param thinMCMC integer indicating the thinning interval of the mcmc-chain
 #' @param accRateMCMC (MCMC) numeric between 0 and 1 indicating the target 
 #'   acceptance rate Passed on to adaptMCMC::MCMC.
-#' @param gammaMCMC (MCMC) controls the speed of adaption. Should be between 0.5
-#'   and 1. A lower gammaMCMC leads to faster adaption. Passed on to 
+#' @param gammaMCMC (MCMC) controls the speed of adaption. Should be in the interval (0.5,1]. A lower gammaMCMC leads to faster adaption. Passed on to 
 #'   adaptMCMC::MCMC.
 #' @param nChainsMCMC integer indicating the number of chains to run. Defaults 
 #'   to 1.
@@ -384,7 +386,7 @@ mcmcPOUMMGivenPriorTreeVTips <- function(
     debug <- FALSE
   }
   
-  if(debug) {
+  if(interactive() && debug) {
     cat("Using prior function:\n")
     print(parPriorMCMC) 
   }
@@ -410,11 +412,11 @@ mcmcPOUMMGivenPriorTreeVTips <- function(
           loglik, par = par, pruneInfo = pruneInfo, 
           memo = memoMaxLoglik, verbose = verbose)
         
-        if(debug) {
+        if(interactive() && debug) {
           cat("par: ", toString(round(par, 6)), ";", "ll:", ll)
         }
       }
-      if(debug) {
+      if(interactive() && debug) {
         cat("\n")
       }
       
@@ -425,13 +427,13 @@ mcmcPOUMMGivenPriorTreeVTips <- function(
   doMCMC <- function(i, pruneInfo) {
     memoMaxLoglik <- new.env()
     
-    if(verbose) {
+    if(interactive() && verbose) {
       cat('Chain No:', i, ', nSamplesMCMC = ', nSamplesMCMC, ', initial state: \n')
     }
     
     init <- parInitMCMC(i, fitML)
     
-    if(verbose) {
+    if(interactive() && verbose) {
       print(init)  
     }
     
@@ -442,7 +444,9 @@ mcmcPOUMMGivenPriorTreeVTips <- function(
         memoMaxLoglik = memoMaxLoglik, chainNo = i, pruneInfo = pruneInfo), 
       thinMCMC = thinMCMC)
     
-    print(paste("Finished chain no:", i))
+    if(interactive()) {
+      print(paste("Finished chain no:", i))
+    }
     
     ch$parScaleMCMC.start <- parScaleMCMC    
     
@@ -458,16 +462,23 @@ mcmcPOUMMGivenPriorTreeVTips <- function(
     chains <- foreach(
       i = 1:nChainsMCMC, .packages = c('coda', 'POUMM', 'adaptMCMC')) %dopar% {
         # need to reinitialize the integrator since it is a C++ object
-        pruneInfo$integrator <- Integrator$new()
-        
-        pruneInfo$integrator$setPruningInfo(
-          pruneInfo$z,  pruneInfo$se, 
-          pruneInfo$tree$edge,
-          pruneInfo$tree$edge.length, 
-          pruneInfo$M, pruneInfo$N, 
-          pruneInfo$endingAt, 
-          pruneInfo$nodesVector, pruneInfo$nodesIndex, 
-          pruneInfo$unVector, pruneInfo$unIndex)
+        # pruneInfo$integrator <- Integrator$new()
+        # 
+        # pruneInfo$integrator$setPruningInfo(
+        #   pruneInfo$z,  pruneInfo$se, 
+        #   pruneInfo$tree$edge,
+        #   pruneInfo$tree$edge.length, 
+        #   pruneInfo$M, pruneInfo$N, 
+        #   pruneInfo$endingAt, 
+        #   pruneInfo$nodesVector, pruneInfo$nodesIndex, 
+        #   pruneInfo$unVector, pruneInfo$unIndex)
+        # 
+        pruneInfo$integrator <- POUMM_AbcPOUMM$new(pruneInfo$tree, pruneInfo$z[1:pruneInfo$N], 
+                                             if(length(pruneInfo$se) != pruneInfo$N) {
+                                               rep(pruneInfo$se[1], pruneInfo$N)
+                                             } else {
+                                               pruneInfo$se
+                                             })
         
         chain <- try(doMCMC(i, pruneInfo = pruneInfo), silent = TRUE)
       }

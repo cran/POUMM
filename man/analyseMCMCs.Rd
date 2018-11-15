@@ -15,4 +15,3 @@ analyseMCMCs(chains, stat = NULL, statName = "logpost", start, end,
 Extract data from an MCMC chain
 This is an internal function.
 }
-

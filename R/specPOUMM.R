@@ -1,9 +1,8 @@
-#' @name specifyPOUMM
+#' @name specPOUMM
 #' 
 #' @title Specifying a POUMM fit
 #' 
 #' @description Specification and validation of POUMM/PMM settings.
-#' specifyPOUMM sets default POUMM settings. 
 #' 
 #' @param z,tree a numeric vector and a phylo object on which the fit is to be done. 
 #'    These arguments are used in order to guess meaningful values for the parLower,
@@ -68,7 +67,7 @@
 #' # Default for POUMM:
 #' parLower = c(alpha = 0, theta = zMin - 2 * (zMax - zMin), sigma = 0, sigmae = 0)
 #' parUpper = c(alpha = 69.31 / tMean, theta = zMax + 2 * (zMax - zMin), 
-#'              sigma = POUMM::sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD,
+#'              sigma = sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD,
 #'                                     t = tMean), 
 #'              sigmae = 2 * zSD)
 #' }
@@ -140,8 +139,7 @@
 #' @param accRateMCMC numeric between 0 and 1 indicating the target 
 #'   acceptance rate of the  adaptive Metropolis sampling (see details in ?POUMM). 
 #'   Default 0.01.
-#' @param gammaMCMC controls the speed of adaption. Should be between 0.5 and
-#'   1. A lower gamma leads to faster adaption. Default value is 0.5.
+#' @param gammaMCMC controls the speed of adaption. Should be in the interval (0.5,1]. A lower gamma leads to faster adaption. Default value is 0.50001.
 #' @param nChainsMCMC integer indicating the number of chains to run. 
 #'   Defaults to 3 chains, from which the first one is a sample from the prior 
 #'   distribution (see samplePriorMCMC).
@@ -160,8 +158,8 @@
 #' @return A named list to be passed as a spec argument to POUMM.
 NULL
 
-#' @describeIn specifyPOUMM Specify parameters for fitting a POUMM model. 
-#'   Parameter vector is c(alpha, theta, sigma, sigmae) 
+#' @describeIn specPOUMM Specify parameters for fitting a POUMM model. 
+#'   Parameter vector is c(alpha, theta, sigma, sigmae). Default model settings. 
 #' 
 #' @export
 specifyPOUMM <- function(
@@ -179,7 +177,7 @@ specifyPOUMM <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE,
   validateSpec=TRUE) {
@@ -222,7 +220,7 @@ specifyPOUMM <- function(
                  sigma = 0, sigmae = 0), 
     
     parUpper = c(alpha = 69.31 / tMean, theta = zMax + 2 * (zMax - zMin), 
-                 sigma = POUMM::sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD, t = tMean), 
+                 sigma = sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD, t = tMean), 
                  sigmae = 2 * zSD),
     
     g0Prior = NULL, 
@@ -232,10 +230,10 @@ specifyPOUMM <- function(
     control = list(factr = 1e8),
     
     parPriorMCMC = function(par) {
-      dexp(par[1], rate = tMean / 6.931, TRUE) + 
-        dnorm(par[2], zMean, 2 * zSD, TRUE) +
-        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), TRUE) + 
-        dexp(par[4], rate = 2 / zSD, TRUE)  
+      dexp(par[1], rate = tMean / 6.931, log = TRUE) + 
+        dnorm(par[2], zMean, 2 * zSD, log = TRUE) +
+        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), log = TRUE) + 
+        dexp(par[4], rate = 2 / zSD, log = TRUE)  
       
     },
     
@@ -280,7 +278,7 @@ specifyPOUMM <- function(
   spec
 }
 
-#' @describeIn specifyPOUMM Fitting a POU model with fixed sigmae.
+#' @describeIn specPOUMM Fitting a POU model with fixed sigmae.
 #'  Parameter vector is c(alpha, theta, sigma).
 #' @export
 specifyPOUMM_ATS <- function(
@@ -297,7 +295,7 @@ specifyPOUMM_ATS <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE, 
   sigmaeFixed = 0) {
@@ -341,12 +339,12 @@ specifyPOUMM_ATS <- function(
                  sigma = 0), 
     
     parUpper = c(alpha = 69.31 / tMean, theta = zMax + 2 * (zMax - zMin), 
-                 sigma = POUMM::sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD, t = tMean)),
+                 sigma = sigmaOU(H2 = .99, alpha = 69.31 / tMean, sigmae = 2 * zSD, t = tMean)),
     
     parPriorMCMC = function(par) {
       dexp(par[1], rate = tMean / 6.931, log = TRUE) +
-        dnorm(par[2], zMean, 2 * zSD, TRUE) +
-        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), TRUE)
+        dnorm(par[2], zMean, 2 * zSD, log = TRUE) +
+        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), log = TRUE)
     },
     
     parInitMCMC = function(chainNo, fitML = NULL) {
@@ -384,7 +382,7 @@ specifyPOUMM_ATS <- function(
   spec
 }
 
-#' @describeIn specifyPOUMM Fitting a POU model with fixed sigmae.
+#' @describeIn specPOUMM Fitting a POU model with fixed sigmae.
 #'  Parameter vector is c(alpha, theta, sigma, g0).
 #' @export
 specifyPOUMM_ATSG0 <- function(
@@ -401,7 +399,7 @@ specifyPOUMM_ATSG0 <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE, 
   sigmaeFixed = 0) {
@@ -446,14 +444,14 @@ specifyPOUMM_ATSG0 <- function(
                  g0 = zMin - 2 * zSD), 
     
     parUpper = c(alpha = 69.31 / tMean, theta = zMax + 2 * (zMax - zMin), 
-                 sigma = POUMM::sigmaOU(H2 = .99, alpha = 69.31 / tMean, 
+                 sigma = sigmaOU(H2 = .99, alpha = 69.31 / tMean, 
                                         sigmae = 2 * zSD, t = tMean),
                  g0 = zMax + 2 * zSD),
     
     parPriorMCMC = function(par) {
       dexp(par[1], rate = tMean / 6.931, log = TRUE) +
-        dnorm(par[2], zMean, 2 * zSD, TRUE) +
-        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), TRUE) +
+        dnorm(par[2], zMean, 2 * zSD, log = TRUE) +
+        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), log = TRUE) +
         dnorm(par[4], zMean, 2 * zSD, log = TRUE)
     },
     
@@ -492,7 +490,7 @@ specifyPOUMM_ATSG0 <- function(
   spec
 }
 
-#' @describeIn specifyPOUMM Fitting a POUMM model with sampling of g0.
+#' @describeIn specPOUMM Fitting a POUMM model with sampling of g0.
 #'  Parameter vector is c(alpha, theta, sigma, sigmae, g0).
 #' @export
 specifyPOUMM_ATSSeG0 <- function(
@@ -509,7 +507,7 @@ specifyPOUMM_ATSSeG0 <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
   
@@ -550,14 +548,14 @@ specifyPOUMM_ATSSeG0 <- function(
                  sigma = 0, sigmae = 0, g0 = zMin - 2 * zSD), 
     
     parUpper = c(alpha = 69.31 / tMean, theta = zMax + 2 * (zMax - zMin), 
-                 sigma = POUMM::sigmaOU(H2 = .99, alpha = 69.31 / tMean, 
+                 sigma = sigmaOU(H2 = .99, alpha = 69.31 / tMean, 
                                         sigmae = 2 * zSD, t = tMean), 
                  sigmae = 2 * zSD, g0 = zMax + 2 * zSD),
     
     parPriorMCMC = function(par) {
       dexp(par[1], rate = tMean / 6.931, log = TRUE) +
         dnorm(par[2], zMean, 2 * zSD, TRUE) +
-        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), TRUE) +
+        dexp(par[3],  rate = sqrt(tMean / (zVar * 0.6931)), log = TRUE) +
         dexp(par[4], rate = 2 / zSD, log = TRUE) + 
         dnorm(par[5], zMean, 2 * zSD, log = TRUE)
     },
@@ -598,7 +596,7 @@ specifyPOUMM_ATSSeG0 <- function(
 }
 
 
-#' @describeIn specifyPOUMM Specify parameter for fitting a PMM model. 
+#' @describeIn specPOUMM Specify parameter for fitting a PMM model. 
 #'   Parameter vector is c(sigma, sigmae)
 #' @export
 specifyPMM <- function(
@@ -615,7 +613,7 @@ specifyPMM <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
 
@@ -657,7 +655,7 @@ specifyPMM <- function(
     
     parLower = c(sigma = 0, sigmae = 0),
     parUpper = c(
-      sigma = POUMM::sigmaOU(H2 = .99, alpha = 0, sigmae = 2 * zSD, t = tMean), 
+      sigma = sigmaOU(H2 = .99, alpha = 0, sigmae = 2 * zSD, t = tMean), 
       sigmae = 2 * zSD),
     
     parPriorMCMC = function(par) {
@@ -699,7 +697,7 @@ specifyPMM <- function(
   spec
 }
 
-#' @describeIn specifyPOUMM Specify parameter for fitting a PMM model with
+#' @describeIn specPOUMM Specify parameter for fitting a PMM model with
 #'  sampling of g0. Parameter vector is c(sigma, sigmae, g0).
 #' @export
 specifyPMM_SSeG0 <- function(
@@ -716,7 +714,7 @@ specifyPMM_SSeG0 <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
   
@@ -757,7 +755,7 @@ specifyPMM_SSeG0 <- function(
     
     parLower = c(sigma = 0, sigmae = 0, g0 = zMin - 2 * zSD),
     parUpper = c(
-      sigma = POUMM::sigmaOU(H2 = .99, alpha = 0, sigmae = 2 * zSD, t = tMean), 
+      sigma = sigmaOU(H2 = .99, alpha = 0, sigmae = 2 * zSD, t = tMean), 
       sigmae = 2 * zSD, g0 = zMax + 2 * zSD),
     
     parPriorMCMC = function(par) {
@@ -800,7 +798,7 @@ specifyPMM_SSeG0 <- function(
   spec
 }
 
-#' @describeIn specifyPOUMM Fitting a POUMM model with a uniform prior for
+#' @describeIn specPOUMM Fitting a POUMM model with a uniform prior for
 #'  the phylogenetic heritability at mean root-tip distance. Parameter vector is
 #'  c(alpha, theta, H2tMean, sigmae).
 #' @export
@@ -818,7 +816,7 @@ specifyPOUMM_ATH2tMeanSe <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
   
@@ -848,12 +846,12 @@ specifyPOUMM_ATH2tMeanSe <- function(
     
     parMapping = function(par) {
       if(is.matrix(par)) {
-        par[, 3] <- POUMM::sigmaOU(par[, 3], par[, 1], par[, 4], tMean)
+        par[, 3] <- sigmaOU(par[, 3], par[, 1], par[, 4], tMean)
         par <- cbind(par, NA)
         
         colnames(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       } else {
-        par[3] <- POUMM::sigmaOU(par[3], par[1], par[4], tMean)
+        par[3] <- sigmaOU(par[3], par[1], par[4], tMean)
         par <- c(par, NA)
         
         names(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
@@ -869,7 +867,7 @@ specifyPOUMM_ATH2tMeanSe <- function(
   
     parPriorMCMC = function(par) {
       dexp(par[1], rate = tMean / 6.931, log = TRUE) +
-        dnorm(par[2], zMean, 2 * zSD, TRUE) +
+        dnorm(par[2], zMean, 2 * zSD, log = TRUE) +
         dunif(par[3], min = 0, max = 1, log = TRUE) +
         dexp(par[4], rate = 2 / zSD, log = TRUE)
     },
@@ -911,7 +909,7 @@ specifyPOUMM_ATH2tMeanSe <- function(
 
 
 
-#' @describeIn specifyPOUMM Fitting a POUMM model with a uniform prior for
+#' @describeIn specPOUMM Fitting a POUMM model with a uniform prior for
 #'  the phylogenetic heritability at mean root-tip with sampling of g0.
 #'  Parameter vector is c(alpha, theta, H2tMean, sigmae, g0).
 #' @export
@@ -929,7 +927,7 @@ specifyPOUMM_ATH2tMeanSeG0 <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
   
@@ -959,11 +957,11 @@ specifyPOUMM_ATH2tMeanSeG0 <- function(
     
     parMapping = function(par) {
       if(is.matrix(par)) {
-        par[, 3] <- POUMM::sigmaOU(par[, 3], par[, 1], par[, 4], tMean)
+        par[, 3] <- sigmaOU(par[, 3], par[, 1], par[, 4], tMean)
         
         colnames(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       } else {
-        par[3] <- POUMM::sigmaOU(par[3], par[1], par[4], tMean)
+        par[3] <- sigmaOU(par[3], par[1], par[4], tMean)
         
         names(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       }
@@ -1021,7 +1019,7 @@ specifyPOUMM_ATH2tMeanSeG0 <- function(
 
 
 
-#' @describeIn specifyPOUMM Fitting a PMM model with a uniform prior for
+#' @describeIn specPOUMM Fitting a PMM model with a uniform prior for
 #'  the phylogenetic heritability at mean root-tip distance. Parameter vector is
 #'  c(H2tMean, sigmae).
 #' @export
@@ -1039,7 +1037,7 @@ specifyPMM_H2tMeanSe <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
   
@@ -1070,12 +1068,12 @@ specifyPMM_H2tMeanSe <- function(
     parMapping = function(par) {
       if(is.matrix(par)) {
         par <- cbind(0, 0, par[, 1:2, drop = FALSE], NA)
-        par[, 3] <- POUMM::sigmaOU(par[, 3], 0, par[, 4], tMean)
+        par[, 3] <- sigmaOU(par[, 3], 0, par[, 4], tMean)
         
         colnames(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       } else {
         par <- c(0, 0, par, NA)
-        par[3] <- POUMM::sigmaOU(par[3], 0, par[4], tMean)
+        par[3] <- sigmaOU(par[3], 0, par[4], tMean)
         
         names(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       }
@@ -1127,7 +1125,7 @@ specifyPMM_H2tMeanSe <- function(
 }
 
 
-#' @describeIn specifyPOUMM Fitting a PMM model with a uniform prior for
+#' @describeIn specPOUMM Fitting a PMM model with a uniform prior for
 #'  the phylogenetic heritability at mean root-tip distance with sampling of G0.
 #'  Parameter vector is c(H2tMean, sigmae, g0).
 #' @export
@@ -1145,7 +1143,7 @@ specifyPMM_H2tMeanSeG0 <- function(
   parScaleMCMC = NULL,
   nSamplesMCMC = 1e5, nAdaptMCMC = nSamplesMCMC, 
   thinMCMC = 100, 
-  accRateMCMC = .01, gammaMCMC = 0.5, nChainsMCMC = 3, 
+  accRateMCMC = .01, gammaMCMC = 0.50001, nChainsMCMC = 3, 
   samplePriorMCMC = TRUE,
   parallelMCMC = FALSE) {
   
@@ -1176,12 +1174,12 @@ specifyPMM_H2tMeanSeG0 <- function(
     parMapping = function(par) {
       if(is.matrix(par)) {
         par <- cbind(0, 0, par)
-        par[, 3] <- POUMM::sigmaOU(par[, 3], 0, par[, 4], tMean)
+        par[, 3] <- sigmaOU(par[, 3], 0, par[, 4], tMean)
         
         colnames(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       } else {
         par <- c(0, 0, par)
-        par[3] <- POUMM::sigmaOU(par[3], par[1], par[4], tMean)
+        par[3] <- sigmaOU(par[3], par[1], par[4], tMean)
         
         names(par) <- c("alpha", "theta", "sigma", "sigmae", "g0")
       }
@@ -1195,7 +1193,7 @@ specifyPMM_H2tMeanSeG0 <- function(
     parPriorMCMC = function(par) {
       dunif(par[1], min = 0, max = 1, log = TRUE) +
         dexp(par[2], rate = 2 / zSD, log = TRUE) + 
-        dnorm(par[3], zMean, 2 * zSD)
+        dnorm(par[3], zMean, 2 * zSD, log = TRUE)
       
     },
     
@@ -1298,8 +1296,8 @@ validateSpecPOUMM <- function(spec) {
     if(accRateMCMC <= 0 | accRateMCMC > 1) {
       stop("accRateMCMC should be a positive number between 0 and 1.")
     } 
-    if(gammaMCMC < 0.5 | gammaMCMC > 1) {
-      stop("gammaMCMC should be between 0.5 and 1.")
+    if(gammaMCMC <= 0.5 | gammaMCMC > 1) {
+      stop("gammaMCMC should be in (0.5,1].")
     }
     if(nChainsMCMC == 1 & samplePriorMCMC) {
       warning("Only one MCMC to be run which samples from the prior.")

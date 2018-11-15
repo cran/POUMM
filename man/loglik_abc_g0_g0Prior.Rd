@@ -24,4 +24,3 @@ Processing of the root value and calculation of the maximum log-likelihood
 for the given coefficients abc, and parameters theta, g0 and g0Prior. This is
 an internal function.
 }
-

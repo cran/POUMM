@@ -17,8 +17,12 @@ function should be returned.}
 
 \item{...}{additional parameters passed to summary.POUMM}
 }
+\value{
+a function of a numerica matrix x with 3 columns corresponding to
+ tau, tanc and t (see covFunPOUMM). The function reteruns a two-colun matrix
+ with the lower and upper limit of the HPD for each row in the input matrix.
+}
 \description{
 A vectorized function returning HPD intervals of the expected covariance for 
 a given tree and a fitted POUMM model
 }
-

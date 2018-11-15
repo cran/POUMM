@@ -18,4 +18,3 @@ The vector of e-values (residuals) corresponding to the tip-labels in
 \description{
 Extract maximum likelihood environmental contributions (residuals) at the tips of a tree, to which a POUMM model has been fitted.
 }
-

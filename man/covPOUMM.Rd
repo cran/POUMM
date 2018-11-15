@@ -4,7 +4,8 @@
 \alias{covPOUMM}
 \title{Expected covariance of two tips at given root-tip time and phylogenetic distance}
 \usage{
-covPOUMM(alpha, sigma, sigmae, t, tau, corr = FALSE, as.matrix = FALSE)
+covPOUMM(alpha, sigma, sigmae, t, tau, tanc = t - tau/2, corr = FALSE,
+  as.matrix = FALSE)
 }
 \arguments{
 \item{alpha, sigma, sigmae}{POUMM parameters}
@@ -16,6 +17,9 @@ couple (row) from cbind(t, tau).}
 \item{tau}{A non-negative number or vector indicating the phylogenetic 
 distance between two tips, each of them located at time t from the root. 
 If a vector, the evaluation is done on each couple (row) from cbind(t, tau).}
+
+\item{tanc}{A non-negative number or vector indication the root-mrca distance
+for a couple of tips. Defaults to t-tau/2 corresponding to an ultrametric tree.}
 
 \item{corr}{Logical indicating whether correlation should be returned instead
 of covariance.}
@@ -35,4 +39,3 @@ Expected covariance of two tips at given root-tip time and phylogenetic distance
 The function assumes that the two tips are at equal distance t from 
 the root. This implies that the root-tip distance of their mrca is t - tau/2.
 }
-

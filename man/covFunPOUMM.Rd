@@ -11,14 +11,16 @@ covFunPOUMM(object, corr = FALSE)
 \item{object}{an S3 object of class POUMM}
 
 \item{corr}{logical indicating if an expected correlation function 
-should be returned}
+should be returned
+  For non-ultrametric trees, usually the mean root-tip distance is used.}
 }
 \value{
-a function of a numerical parameter x denoting the phylogenetic distance
-between a couple of tips.
+a function of three numerical parameters:
+ tau - the phylogenetic distance between a two tips;
+ tanc - the distance from the root to their most recent common ancestor.
+ t - the root-tip distance (assuming that the two tips are at equal distance from the root)
 }
 \description{
 A vectorized expected covariance function for a given tree and a fitted POUMM
 model
 }
-

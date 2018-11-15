@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{chld}
 \alias{chld}
-\title{Node indices of the direct descendants of n in the phylogeny tree.}
+\title{Node indices of the direct descendants of n in the phylogeny.}
 \usage{
 chld(tree, n)
 }
@@ -15,6 +15,5 @@ chld(tree, n)
 An integer vector.
 }
 \description{
-Node indices of the direct descendants of n in the phylogeny tree.
+Node indices of the direct descendants of n in the phylogeny.
 }
-

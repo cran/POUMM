@@ -26,4 +26,3 @@ POUMM  model.
 The parameters extracted are the ones used as input to the model's
 parMapping function.
 }
-

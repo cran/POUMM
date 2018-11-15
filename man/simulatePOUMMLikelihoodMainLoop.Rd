@@ -15,4 +15,3 @@ Nothing
 \description{
 Writes verbose messages of the order of tree traversal during likelihood calculation
 }
-

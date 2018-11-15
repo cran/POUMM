@@ -14,4 +14,3 @@
 \description{
 Extract maximum likelihood and degrees of freedom from a fitted POUMM model
 }
-

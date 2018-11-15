@@ -21,4 +21,3 @@ getting measured or passing on the infection to another host}
 \description{
 Phylogenetic heritability estimated at time t
 }
-

@@ -32,4 +32,3 @@ trajectory <- rTrajectoryOU(z0, t, 2, 2, 1, steps = nSteps)
 plot(trajectory, type = 'l')
 
 }
-

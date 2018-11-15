@@ -28,4 +28,3 @@ initial state (only for test purpose)
 Used for test purpose only. This is an internal function and is
   appropriate for small time-steps only.
 }
-

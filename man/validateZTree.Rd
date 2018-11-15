@@ -18,4 +18,3 @@ The function either returns TRUE or exits with an error message if it
 \description{
 Validate phenotypic values and phylogenetic tree
 }
-

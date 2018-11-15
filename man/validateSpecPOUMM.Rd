@@ -17,4 +17,3 @@ The function either returns TRUE or exits with an error message if it
 \description{
 Validate a POUMM specification
 }
-

@@ -199,31 +199,17 @@ rTrajectoryOU <- function(z0, t, alpha, theta, sigma, steps = 1) {
 #'   parameters
 #' @examples 
 #' # At POUMM stationary state (equilibrium, t=Inf)
-#' H2 <- POUMM::H2(alpha = 0.75, sigma = 1, sigmae = 1, t = Inf)     # 0.4
-#' alpha <- POUMM::alpha(H2 = H2, sigma = 1, sigmae = 1, t = Inf)    # 0.75
-#' sigma <- POUMM::sigmaOU(H2 = H2, alpha = 0.75, sigmae = 1, t = Inf) # 1
-#' sigmae <- POUMM::sigmae(H2 = H2, alpha = 0.75, sigma = 1, t = Inf) # 1
+#' H2 <- H2(alpha = 0.75, sigma = 1, sigmae = 1, t = Inf)     # 0.4
+#' alpha <- alpha(H2 = H2, sigma = 1, sigmae = 1, t = Inf)    # 0.75
+#' sigma <- sigmaOU(H2 = H2, alpha = 0.75, sigmae = 1, t = Inf) # 1
+#' sigmae <- sigmae(H2 = H2, alpha = 0.75, sigma = 1, t = Inf) # 1
 #' 
 #' # At finite time t = 0.2
-#' H2 <- POUMM::H2(alpha = 0.75, sigma = 1, sigmae = 1, t = 0.2)     # 0.1473309
-#' alpha <- POUMM::alpha(H2 = H2, sigma = 1, sigmae = 1, t = 0.2)    # 0.75
-#' sigma <- POUMM::sigmaOU(H2 = H2, alpha = 0.75, sigmae = 1, t = 0.2) # 1
-#' sigmae <- POUMM::sigmae(H2  =  H2, alpha = 0.75, sigma = 1, t = 0.2) # 1
+#' H2 <- H2(alpha = 0.75, sigma = 1, sigmae = 1, t = 0.2)     # 0.1473309
+#' alpha <- alpha(H2 = H2, sigma = 1, sigmae = 1, t = 0.2)    # 0.75
+#' sigma <- sigmaOU(H2 = H2, alpha = 0.75, sigmae = 1, t = 0.2) # 1
+#' sigmae <- sigmae(H2  =  H2, alpha = 0.75, sigma = 1, t = 0.2) # 1
 #' 
-#' # Comparing with the empirical H2e from a simulation
-#' N <- 20 
-#' tree <- TreeSim::sim.bd.taxa(N, 1, lambda = 2, mu = 1, complete =
-#' FALSE)[[1]] 
-#' tMean <- mean(nodeTimes(tree, tipsOnly = TRUE))
-#' z <- rVNodesGivenTreePOUMM(tree, 8, 2, 2, 1)
-#'
-#' \dontrun{
-#' phytools::plotBranchbyTrait(tree, z, mode = "nodes", show.tip.label =
-#'   FALSE, show.node.label = FALSE) 
-#' ape::nodelabels(round(z[-(1:N)], 2)) 
-#' ape::tiplabels(round(z[(1:N)], 2))
-#' 
-#' }      
 #'    
 #' @name PhylogeneticH2
 #' @seealso OU
@@ -231,36 +217,32 @@ NULL
 
 #' @describeIn PhylogeneticH2 Calculate alpha given time t, H2, sigma and sigmae
 #' 
-#' @details The function alpha invokes the gsl function lambert_W0.
-#' 
-#' @importFrom gsl lambert_W0
+#' @importFrom lamW lambertW0
 #'
 #' @export
 alpha <- function(H2, sigma, sigmae, t = Inf) {
   # if(!all(H2>=0 & H2 <=1 & sigma >= 0 & sigmae >=0 & t>=0)) {
-  #   warning(paste0("Function POUMM::alpha was called on invalid parameters. ", 
+  #   warning(paste0("Function `alpha()` was called on invalid parameters. ", 
   #                  "Check that H2>=0 & H2 <=1 & sigma >= 0 & sigmae >=0 & t>=0.",
   #                  "Parameter values were: ", 
   #                  toString(c(H2=H2, sigma=sigma, sigmae=sigmae, t=t))))
   #   NA
   # }
   if(is.infinite(t)) {
-    if(H2 == 1) {
+    ifelse(H2 == 1,
       # Assume correctly defined PMM, i.e. Brownian motion with sigma > 0 and 
       # environmental deviation with sigmae >= 0
-      0
-    } else {
+      0,
       # H2 is the phylogenetic heritability at equilibrium
       sigma^2 * (1 - H2) / (2 * H2 * sigmae^2)    
-    }
+    )
   } else {
     # finite t
     y <- sigma^2 / sigmae^2 * (1 / H2 - 1)
-    if(is.na(y) | is.infinite(y)) {
-      as.double(NA)
-    } else {
-      (t * y + lambert_W0((-exp(-t * y)) * t * y)) / (2 * t)
-    }
+    ifelse(is.na(y) | is.infinite(y),
+      as.double(NA),
+      (t * y + lambertW0((-exp(-t * y)) * t * y)) / (2 * t)
+    )
   }
 }
 
@@ -273,22 +255,20 @@ alpha <- function(H2, sigma, sigmae, t = Inf) {
 #' @export
 sigmaOU <- function(H2, alpha, sigmae, t=Inf) {
   res <- if(is.infinite(t)) {
-    if(alpha == 0) {
+    ifelse(alpha == 0,
       # BM
-      sqrt(sigmae^2 * H2 / (t * (1 - H2)))
-    } else {
+      sqrt(sigmae^2 * H2 / (t * (1 - H2))),
       # alpha>0, OU in equilibrium
       sqrt(2 * alpha * H2 * sigmae^2 / (1 - H2))
-    }
+    )
   } else {
     # t is finite
-    if(alpha == 0) {
+    ifelse(alpha == 0,
       # BM
-      sqrt(sigmae^2 * H2 / (t * (1 - H2)))
-    } else {
+      sqrt(sigmae^2 * H2 / (t * (1 - H2))),
       # alpha>0, OU not in equilibrium
       sqrt(2 * alpha * H2 * sigmae^2 / ((1 - exp(-2 * alpha * t)) * (1 - H2)))
-    } 
+    ) 
   }
   names(res) <- NULL
   res
@@ -363,6 +343,8 @@ H2 <- function(alpha, sigma, sigmae, t = Inf, tm = 0) {
 #' @param tau A non-negative number or vector indicating the phylogenetic 
 #'   distance between two tips, each of them located at time t from the root. 
 #'   If a vector, the evaluation is done on each couple (row) from cbind(t, tau).
+#' @param tanc A non-negative number or vector indication the root-mrca distance
+#' for a couple of tips. Defaults to t-tau/2 corresponding to an ultrametric tree.
 #' @param corr Logical indicating whether correlation should be returned instead
 #' of covariance.
 #' @param as.matrix Logical indicating if a variance-covariance matrix should be
@@ -376,11 +358,12 @@ H2 <- function(alpha, sigma, sigmae, t = Inf, tm = 0) {
 #'   numbers or a list of matrices.
 #' 
 #' @export
-covPOUMM <- function(alpha, sigma, sigmae, t, tau, corr = FALSE, as.matrix = FALSE) {
-  if(length(t) == 1 & length(tau) == 1) {
+covPOUMM <- function(alpha, sigma, sigmae, t, tau, tanc = t - tau/2, 
+                     corr = FALSE, as.matrix = FALSE) {
+  if(length(t) == 1 & length(tau) == 1 & length(tanc) == 1) {
     covMat <- covVTipsGivenTreePOUMM(
       tree = NULL, alpha = alpha, sigma = sigma, sigmae = sigmae,
-      tanc = rbind(c(t, t-tau/2), c(t-tau/2, t)), 
+      tanc = rbind(c(t, tanc), c(tanc, t)), 
       tauij = rbind(c(0, tau), c(tau, 0)), corr = corr)
     if(as.matrix) {
       covMat
@@ -388,13 +371,14 @@ covPOUMM <- function(alpha, sigma, sigmae, t, tau, corr = FALSE, as.matrix = FAL
       covMat[1,2]
     }
   } else {
-    ttau <- cbind(t, tau)
+    ttau <- cbind(t, tau, tanc)
     apply(ttau, 1, function(.) {
       t <- .[1]
       tau <- .[2]
+      tanc <- .[3]
       covMat <- covVTipsGivenTreePOUMM(
         tree = NULL, alpha = alpha, sigma = sigma, sigmae = sigmae,
-        tanc = rbind(c(t, t-tau/2), c(t-tau/2, t)), 
+        tanc = rbind(c(t, tanc), c(tanc, t)), 
         tauij = rbind(c(0, tau), c(tau, 0)), corr = corr)
       if(as.matrix) {
         covMat

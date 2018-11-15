@@ -4,10 +4,10 @@
 \alias{POUMM}
 \title{The Phylogenetic (Ornstein-Uhlenbeck) Mixed Model}
 \usage{
-POUMM(z, tree, se = 0, zName = "z", treeName = "tree", parDigits = 6,
-  usempfr = 0, useCpp = TRUE, ..., spec = NULL, doMCMC = TRUE,
-  likPOUMM_lowLevelFun = POUMM::likPOUMMGivenTreeVTipsC2, verbose = FALSE,
-  debug = FALSE)
+POUMM(z, tree, se = 0, zName = "z", treeName = "tree",
+  parDigits = 6, usempfr = 0, useCpp = TRUE, ..., spec = NULL,
+  doMCMC = TRUE, likPOUMM_lowLevelFun = likPOUMMGivenTreeVTipsC,
+  verbose = FALSE, debug = FALSE)
 }
 \arguments{
 \item{z}{Either a numeric vector containing the phenotypic values at the tips 
@@ -36,7 +36,7 @@ result in an infinite loop during optim. Specify a negative number
 to disable rounding.}
 
 \item{usempfr}{integer indicating if and how mpfr should be used for small 
-parameter values (any(c(alpha, sigma, sigmae) < 0.01)). Using the mpfr 
+parameter values (`any(c(alpha, sigma, sigmae) < 0.01)`). Using the mpfr 
 package can be forced by specifying an integer greater or equal to 2. 
 Setting usempfr=0 (default) causes high precision likelihood 
 calculation to be done on each encounter of parameters with at least 1 bigger
@@ -51,30 +51,26 @@ used for faster vector operations. Defaults to TRUE. Since the C++ likelihood
 implementation does not support mpfr, useCpp gets disabled when usempfr is 
 bigger than 0.}
 
-\item{...}{additional arguments passed to the likPOUMMGivenTreeVTips function 
-(?dVGivenTreeOU for details).}
+\item{...}{additional arguments passed to the `likPOUMMGivenTreeVTips()` function 
+(`?dVGivenTreeOU` for details).}
 
 \item{spec}{A named list specifying how the ML and MCMC fit should be done. 
-See ?specifyPOUMM.}
+See `?specifyPOUMM`.}
 
-\item{doMCMC}{Deprecated - use nSamplesMCMC = 0 instead. 
+\item{doMCMC}{Deprecated - replaced by specifying nSamplesMCMC as a member
+of spec instead (see `?specifyPOUMM`). 
 logical: should a MCMC fit be performed. An MCMC fit provides a 
 sample from the posterior distribution of the parameters given a prior 
 distribution and the data. Unlike the ML-fit, it allows to estimate 
 confidence intervals for the estimated parameters. This argument is TRUE by 
-default. The current implementation uses a modified version of the adaptive 
-Metropolis sampler from the package "adaptMCMC" written by Andreas 
+default. The current implementation uses the adaptive 
+Metropolis sampler from the package `adaptMCMC` written by Andreas 
 Scheidegger. To obtain meaningful estimates MCMC may need to run for several
 millions of iterations (parameter nSamplesMCMC set to 1e5 by default). See 
-parameters ending at MCMC in ?specifyPOUMM for details.}
+parameters ending at MCMC in `?specifyPOUMM` for details.}
 
 \item{likPOUMM_lowLevelFun}{the low-level function used for POUMM - likelihood 
-calculation. Default value is POUMM::likPOUMMGivenTreeVTipsC2, which would be 
-the fastest on most SIMD-enabled systems and on trees of less than 1000 tips. 
-For bigger trees it may be of benefit to set this parameter to 
-POUMM::likPOUMMGivenTreeVTipsC4, which uses OMP parallelization (best parallel
-speedup achieved on Linux systems with Intel processor and Intel compiler). See
-also the Parallelization section in the package user guide.}
+calculation. Default value is likPOUMMGivenTreeVTipsC.}
 
 \item{verbose, debug}{Logical flags indicating whether to print informative 
 and/or debug information on the standard output (both are set to to FALSE by
@@ -96,8 +92,8 @@ This is the high-level entry point to the POUMM method. The POUMM
 # Please, read the package vignette for more detailed examples.
 N <- 500
 tr <- ape::rtree(N)
-z <- POUMM::rVNodesGivenTreePOUMM(tr, 0, 2, 3, 1, 1)[1:N]
-fit <- POUMM::POUMM(z, tr, spec = POUMM::specifyPOUMM(nSamplesMCMC = 5e4))
+z <- rVNodesGivenTreePOUMM(tr, 0, 2, 3, 1, 1)[1:N]
+fit <- POUMM(z, tr, spec = specifyPOUMM(nSamplesMCMC = 5e4))
 plot(fit)
 summary(fit)
 AIC(fit)
@@ -109,7 +105,7 @@ plot(resid(fit))
 abline(h=0)
 
 # fit PMM to the same data and do a likelihood ratio test
-fitPMM <- POUMM::POUMM(z, tr, spec = POUMM::specifyPMM(nSamplesMCMC = 5e4))
+fitPMM <- POUMM(z, tr, spec = specifyPMM(nSamplesMCMC = 5e4))
 lmtest::lrtest(fitPMM, fit)
 }
 
@@ -117,7 +113,7 @@ lmtest::lrtest(fitPMM, fit)
 \references{
 Mitov, V., and Stadler, T. (2017). Fast and Robust Inference of Phylogenetic Ornstein-Uhlenbeck Models Using Parallel Likelihood Calculation. bioRxiv, 115089. 
  https://doi.org/10.1101/115089
- 
+ Mitov, V., & Stadler, T. (2017). Fast Bayesian Inference of Phylogenetic Models Using Parallel Likelihood Calculation and Adaptive Metropolis Sampling. Systematic Biology, 235739. http://doi.org/10.1101/235739  
  Vihola, M. (2012). Robust adaptive Metropolis algorithm with coerced 
  acceptance rate. Statistics and Computing, 22(5), 997-1008. 
  http://doi.org/10.1007/s11222-011-9269-5 
@@ -130,4 +126,3 @@ Mitov, V., and Stadler, T. (2017). Fast and Robust Inference of Phylogenetic Orn
 \code{\link{specifyPOUMM}} for parametrizations and custom settings
  of the POUMM fit.
 }
-
