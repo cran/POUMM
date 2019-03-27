@@ -8,12 +8,8 @@ library(ggplot2)
 library(data.table)
 library(POUMM)
 
-cachedResultsFile <- "UserGuideCache.RData"
-# this has to be TRUE, otherwise the vignette cannot be generated, since 
-# it does not generate tree and data. 
-useCachedResults <- TRUE
 
-## ---- include=FALSE, eval=useCachedResults-------------------------------
+## ---- include=FALSE, eval=TRUE-------------------------------------------
 N <- 500
 g0 <- 0           
 alpha <- .5        
@@ -21,7 +17,12 @@ theta <- 2
 sigma <- 0.2     
 sigmae <- 0.2 
 
-load(cachedResultsFile)
+data(vignetteCachedResults)
+list2env(vignetteCachedResults, globalenv())
+
+## ----RestorePruneInfo, echo=FALSE, warning=FALSE, results="hide", message=FALSE, eval=TRUE----
+# restore the pruneInfo since it is needed afterwards.
+fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- pruneTree(tree, z[1:length(tree$tip.label)])
 
 ## ---- include=TRUE, eval=TRUE, echo=TRUE---------------------------------
 N <- 500

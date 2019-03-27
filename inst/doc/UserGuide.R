@@ -6,8 +6,7 @@ options(digits = 4)
 
 library(POUMM)
 
-cachedResultsFile <- "UserGuideCache.RData"
-useCachedResults <- file.exists(cachedResultsFile) && TRUE
+useCachedResults <- TRUE
 
 ## ----install-CRAN-packages, eval=FALSE-----------------------------------
 #  install.packages("data.table")
@@ -36,7 +35,8 @@ sigma <- 0.2
 sigmae <- 0.2 
 
 ## ---- include=FALSE, eval=useCachedResults-------------------------------
-load(cachedResultsFile)
+data(vignetteCachedResults)
+list2env(vignetteCachedResults, globalenv())
 
 ## ---- echo=FALSE, fig.height=5, fig.width=7, fig.cap="Dashed black and magenta lines denote the deterministic trend towards the long-term mean $\\theta$, fixing the stochastic parameter $\\sigma=0$."----
 tStep <- 0.025
@@ -117,9 +117,24 @@ if(!useCachedResults) {
   # Don't forget to destroy the parallel cluster to avoid leaving zombie worker-processes.
   parallel::stopCluster(cluster)
 
-  save(g, z, tree, e, 
-       fitPOUMM2, fitPOUMM, fitH2tMean,
-       file = cachedResultsFile)
+  # remove the pruneInfo because it is not serializable. To be restored after loading the cachedResultsFile.
+  fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- NULL
+  
+  vignetteCachedResults <- list(
+    g = g,
+    z = z,
+    tree = tree,
+    e = e,
+    fitPOUMM = fitPOUMM,
+    fitPOUMM2 = fitPOUMM2,
+    fitH2tMean = fitH2tMean)
+  # use list2env(vignetteCachedResults, globalenv())
+  # to restore the objects in the global environment
+  usethis::use_data(vignetteCachedResults, overwrite = TRUE)
+  
+  # save(g, z, tree, e, 
+  #      fitPOUMM2, fitPOUMM, fitH2tMean,
+  #      file = cachedResultsFile)
 } 
 
 ## ----RestorePruneInfo, echo=FALSE, warning=FALSE, results="hide", message=FALSE, eval=TRUE----
