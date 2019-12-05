@@ -1,3 +1,20 @@
+# Copyright 2015-2019 Venelin Mitov
+#
+# This file is part of POUMM.
+#
+# POUMM is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# POUMM is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with POUMM  If not, see <http://www.gnu.org/licenses/>.
+
 # A utility function used to save the maximum point of f (used as wrapper for
 # likelihod-functions).
 memoiseMax <- function(f, par, memo, verbose, ...) {
@@ -277,7 +294,7 @@ analyseMCMCs <- function(chains, stat=NULL, statName="logpost",
     gelman <- NULL
   }
   ESS <- try(lapply(mcs, effectiveSize), silent=TRUE)
-  if(class(ESS)=='try-error') {
+  if(inherits(ESS, 'try-error')) {
     warning(paste("For ", statName, 
                   "calling coda::effectiveSize resulted in an error:", 
                   toString(ESS)))
@@ -288,7 +305,7 @@ analyseMCMCs <- function(chains, stat=NULL, statName="logpost",
   
   HPD <- lapply(mcs, function(.) {
     int <- try(HPDinterval(.), silent = TRUE)
-    if(class(int) == 'try-error') {
+    if(inherits(int, 'try-error')) {
       int <- matrix(as.double(NA), nrow = ncol(as.matrix(.)), ncol = 2)
       colnames(int) <- c("lower", "upper")
       int
@@ -299,7 +316,7 @@ analyseMCMCs <- function(chains, stat=NULL, statName="logpost",
   
   HPD50 <- lapply(mcs, function(.) {
     int <- try(HPDinterval(., 0.5), silent = TRUE)
-    if(class(int) == 'try-error') {
+    if(inherits(int, 'try-error')) {
       int <- matrix(as.double(NA), nrow = ncol(as.matrix(.)), ncol = 2)
       colnames(int) <- c("lower", "upper")
       int
@@ -490,7 +507,7 @@ mcmcPOUMMGivenPriorTreeVTips <- function(
   }
   
   for(i in seq_along(chains)) {
-    if(class(chains[[i]]) == "try-error") {
+    if(inherits(chains[[i]], "try-error")) {
       warning(paste0("Error in MCMC chain no ", i, ":", toString(chains[[i]])))
     }
   }

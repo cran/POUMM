@@ -1,3 +1,21 @@
+# Copyright 2015-2019 Venelin Mitov
+#
+# This file is part of POUMM.
+#
+# POUMM is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# POUMM is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with POUMM  If not, see <http://www.gnu.org/licenses/>.
+
+
 #' @name specPOUMM
 #' 
 #' @title Specifying a POUMM fit
@@ -1254,7 +1272,7 @@ validateZTree <- function(z, tree) {
     if(any(is.na(z)) | any(is.infinite(z))) {
       stop("The trait vector z contains infinite or NA values. All trait-values should be finite!")
     }
-    if(!("phylo"%in%class(tree))) {
+    if(!("phylo" %in% class(tree))) {
       stop("tree must be a phylo object!")
     }
     if(length(tree$tip.label) != length(z)) {
@@ -1367,7 +1385,7 @@ validateSpecPOUMM <- function(spec) {
       }
       
       prior <- try(parPriorMCMC(parInitMCMC), silent = TRUE)
-      if(class(prior) != "numeric" | is.na(prior)) {
+      if( (!"numeric" %in% class(prior)) | is.na(prior) ) {
         print("parInitMCMC : ")
         print(parInitMCMC)
         stop(paste0("parPriorMCMC should return a finite number but returned:", 
