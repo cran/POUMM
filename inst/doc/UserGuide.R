@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 # Make results reproducible
 set.seed(1)
 knitr::opts_chunk$set(cache = FALSE)
@@ -8,7 +8,7 @@ library(POUMM)
 
 useCachedResults <- TRUE
 
-## ----install-CRAN-packages, eval=FALSE-----------------------------------
+## ----install-CRAN-packages, eval=FALSE----------------------------------------
 #  install.packages("data.table")
 #  install.packages("ggplot2")
 #  install.packages("lmtest")
@@ -20,13 +20,13 @@ library(data.table)
 library(lmtest)
 library(ape)
 
-## ---- eval=FALSE, echo=TRUE----------------------------------------------
+## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 #  devtools::install_github(repo="venelin/POUMM")
 
-## ---- eval=FALSE, echo=TRUE----------------------------------------------
+## ---- eval=FALSE, echo=TRUE---------------------------------------------------
 #  install.packages("POUMM")
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 N <- 500
 g0 <- 0           
 alpha <- .5        
@@ -34,7 +34,7 @@ theta <- 2
 sigma <- 0.2     
 sigmae <- 0.2 
 
-## ---- include=FALSE, eval=useCachedResults-------------------------------
+## ---- include=FALSE, eval=useCachedResults------------------------------------
 data(vignetteCachedResults)
 list2env(vignetteCachedResults, globalenv())
 
@@ -73,13 +73,13 @@ legend("topleft",
        lty = c(1, 1, 2, 1, 2, 3), 
        col = c("black", "blue", "black", "magenta", "magenta", "darkgrey"))
 
-## ----simulate-tree, results="hide", eval=!useCachedResults---------------
+## ----simulate-tree, results="hide", eval=!useCachedResults--------------------
 #  # Number of tips
 #  tree <- rtree(N)
 #  
 #  plot(tree, show.tip.label = FALSE)
 
-## ----simulate-gez-OU, eval=!useCachedResults-----------------------------
+## ----simulate-gez-OU, eval=!useCachedResults----------------------------------
 #  # genotypic (heritable) values
 #  g <- rVNodesGivenTreePOUMM(tree, g0, alpha, theta, sigma)
 #  
@@ -141,7 +141,7 @@ if(!useCachedResults) {
 # restore the pruneInfo since it is needed afterwards.
 fitPOUMM$pruneInfo <- fitPOUMM2$pruneInfo <- fitH2tMean$pruneInfo <- pruneTree(tree, z[1:length(tree$tip.label)])
 
-## ----fitPOUMM-1, results="hide", message=FALSE, warning=FALSE, eval=FALSE----
+## ----fitPOUMM-1, results="hide", message=FALSE, warning=FALSE, eval=FALSE-----
 #  fitPOUMM <- POUMM(z[1:N], tree)
 
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC traces from a POUMM MCMC-fit.", results="hide", eval=TRUE----
@@ -153,20 +153,20 @@ plotList$traceplot
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, fig.cap="MCMC univariate density plots. Black dots on the x-axis indicate the ML-fit."----
 plotList$densplot
 
-## ---- warning=FALSE, eval=TRUE-------------------------------------------
+## ---- warning=FALSE, eval=TRUE------------------------------------------------
 summary(fitPOUMM)
 
-## ----fitPOUMM-2, results="hide", eval=FALSE------------------------------
+## ----fitPOUMM-2, results="hide", eval=FALSE-----------------------------------
 #  fitPOUMM2 <- POUMM(z[1:N], tree, spec=list(nSamplesMCMC = 4e5))
 
 ## ---- fig.height=5.4, fig.show="hold", fig.width=7.2, warning=FALSE, results="hide", eval=TRUE----
 plotList <- plot(fitPOUMM2, doPlot = FALSE)
 plotList$densplot
 
-## ---- warning=FALSE, eval=TRUE-------------------------------------------
+## ---- warning=FALSE, eval=TRUE------------------------------------------------
 summary(fitPOUMM2)
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 tMean <- mean(nodeTimes(tree, tipsOnly = TRUE))
 tMax <- max(nodeTimes(tree, tipsOnly = TRUE))
 
@@ -184,11 +184,11 @@ c(# phylogenetic heritability at mean root-tip distance:
   sigmaG2tInf = varOU(t = Inf, alpha, sigma)
   )
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-----------------------------------------------------------
 c(H2empirical = var(g[1:N])/var(z[1:N]))
 summary(fitPOUMM2)["H2e"==stat, unlist(HPD)]
 
-## ---- echo=TRUE, eval=FALSE----------------------------------------------
+## ---- echo=TRUE, eval=FALSE---------------------------------------------------
 #  # set up a parallel cluster on the local computer for parallel MCMC:
 #  cluster <- parallel::makeCluster(parallel::detectCores(logical = FALSE))
 #  doParallel::registerDoParallel(cluster)
@@ -198,7 +198,7 @@ summary(fitPOUMM2)["H2e"==stat, unlist(HPD)]
 #  # Don't forget to destroy the parallel cluster to avoid leaving zombie worker-processes.
 #  parallel::stopCluster(cluster)
 
-## ----create-references, echo=FALSE, include=FALSE, eval=TRUE-------------
+## ----create-references, echo=FALSE, include=FALSE, eval=TRUE------------------
 likCalculation <- c("Rcpp", "Rmpfr")
 mcmcSampling <- c("adaptMCMC")
 mcmcDiagnosis <- c("coda")
