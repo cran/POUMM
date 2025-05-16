@@ -1,8 +1,8 @@
 Package: POUMM
 Type: Package
 Title: The Phylogenetic Ornstein-Uhlenbeck Mixed Model
-Version: 2.1.7
-Date: 2020-10-20
+Version: 2.1.8
+Date: 2025-05-15
 Authors@R: c(person("Venelin", "Mitov", email = "vmitov@gmail.com",
                     comment = '<a href="https://venelin.github.io">venelin.github.io</a>',
                     role = c("aut", "cre", "cph")),
@@ -35,16 +35,16 @@ Imports: ape, data.table(>= 1.13.2), coda, foreach, ggplot2, lamW,
         adaptMCMC, utils
 Suggests: testthat, usethis, Rmpfr, mvtnorm, lmtest, knitr, rmarkdown,
         parallel, doParallel
-RoxygenNote: 7.1.0
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr, rmarkdown
 ByteCompile: no
 NeedsCompilation: yes
 URL: https://venelin.github.io/POUMM/index.html,
         https://github.com/venelin/POUMM
 BugReports: https://github.com/venelin/POUMM/issues
-Packaged: 2020-10-21 08:36:29 UTC; venelin
+Packaged: 2025-05-16 08:57:14 UTC; venelin
 Author: Venelin Mitov [aut, cre, cph] (<a
     href="https://venelin.github.io">venelin.github.io</a>),
   Matt Dowle [ctb]
 Repository: CRAN
-Date/Publication: 2020-10-27 14:00:18 UTC
+Date/Publication: 2025-05-16 09:20:08 UTC
